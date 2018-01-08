@@ -8,7 +8,7 @@ The objectives of this project are:
 ![objective](https://user-images.githubusercontent.com/35077214/34685941-94c6aa3e-f46f-11e7-8ac1-5c13051c82b4.jpg)
 
 Here are how they work:
-1. Raspberry Pi 3 sends a JPEG image to Kafka every 100 seconds. Spark streaming consumes the image, and crops just the water fountain using SSD (Single Shot MultiBox Detector). Then, it scores to see if the cropped image (water fountain) is *empty* or not with keras (Inception v3) model. If the moving average and minimum score (in 3 batches = 5 minutes) exceed a threshold (meaning the model if confident that the fountain is empty), I receive an email alert with the image attached.  
+1. Raspberry Pi 3 sends a JPEG image to Kafka every 100 seconds. Spark streaming consumes the image, and crops just the water fountain using SSD (Single Shot MultiBox Detector). Then, it scores to see if the cropped image (water fountain) is *empty* or not with keras (Inception v3) model. If the moving average and minimum score (in 3 batches = 5 minutes) exceed a threshold (meaning the model is confident that the fountain is empty), I receive an email alert with the image attached.  
 ![cat_water_diagram](https://user-images.githubusercontent.com/35077214/34685968-ab1ea458-f46f-11e7-800b-0d587f633c8b.png)  
 2. Raspberry Pi 3 sends a JPEG image to Kafka when its motion sensor detects a motion in cat's water fountain area. Raspberry Pi 3's LED turns on. Spark streaming consumes the image. If the SSD model determines that the image doesn't contain a *cat*, and my telematics device's GPS location is away from home (meaning I'm not home), I receive an email alert with the image attached.  
 ![cat_motion_diagram](https://user-images.githubusercontent.com/35077214/34685980-c09835ce-f46f-11e7-9d3d-f0d544bc83c0.png)  
@@ -54,14 +54,14 @@ Instructions
 1. Download Raspbian OS onto a micro SD card, and boot up Raspberry Pi 3.
 2. Connect a breadboard, sensors, wires, an LED, and a webcam.
 3. Boot up Raspberry Pi 3, and enable I2C interface using raspi-config.
-4. Install Docker.
+4. Install Docker.  
 `curl -sSL https://get.docker.com/ | sh`  
-5. Run Raspbian container on top of Raspbian. :)
+5. Run Raspbian container on top of Raspbian. :)  
 `sudo docker run -ti --privileged resin/rpi-raspbian:jessie /bin/bash`
-6. Inside the container, install dependencies for sensors:
+6. Inside the container, install dependencies for sensors:  
 `apt-get update`  
 `apt-get install python3-pip python3-dev gcc i2c-tools python-smbus vim git wget`  
-7. On home directory (/root), install Python libraries for the sensors:
+7. On home directory (/root), install Python libraries for the sensors:  
 `git clone https://github.com/adafruit/Adafruit_Python_GPIO.git`  
 `cd Adafruit_Python_GPIO`  
 `python3 setup.py install`  
@@ -71,19 +71,19 @@ Instructions
 `python3 setup.py install`  
 `cd ~`  
 8. Copy the content of this repo (send_real_time_image_to_kafka.py, send_motion_image_to_kafka.py, real_time_image_to_kafka.service, etc).
-9. Enable services:
+9. Enable services:  
 `cp *.service /lib/systemd/system/`  
 `systemctl enable real_time_image_to_kafka.service`  
 `systemctl enable motion_image_to_kafka.service`  
 `systemctl enable temp_humidity_to_kafka.service`
-10. (If you want to generate training image data efficiently) install tp-link smart plug sh script. I used this script on cron to stop the cat water fountain for 10 minutes every hour to capture "empty" water fountain images.
+10. (If you want to generate training image data efficiently) install tp-link smart plug sh script. I used this script on cron to stop the cat water fountain for 10 minutes every hour to capture "empty" water fountain images.  
 `apt-get install nmap`  
 `git clone https://github.com/branning/hs100.git`
-11. Exit out of the container, and save it.
+11. Exit out of the container, and save it.  
 `sudo docker commit [container_ID] yfujimoto/catcam:v1`  
-12. Stop the original container:
+12. Stop the original container:  
 `sudo docker stop [container_ID]`
-13. Run the new container:
+13. Run the new container:  
 `sudo docker run --privileged --restart=always yfujimoto/catcam:v2`  
 ![assembly](https://user-images.githubusercontent.com/35077214/34686023-e906cb4c-f46f-11e7-9e0c-5bf5096e4244.jpg)
 
@@ -92,77 +92,77 @@ Instructions
 
 1. Pull MotionEyeOS Docker image:  
 `sudo docker pull vividboarder/rpi-motioneye`
-2. Create a directory for config:
+2. Create a directory for config:  
 `sudo mkdir -p /mnt/motioneye/config`
-3. Run the container:
+3. Run the container:  
 `sudo docker run --device=/dev --privileged -p 8081:8081 -p 8765:8765 -v /mnt/motioneye/config:/etc/motioneye vividboarder/rpi-motioneye:latest`
 4. On your web browser, log into http://[ip_address]:8765/ and add the webcam, add admin password, and disable motion detection.
-5. Exit out of the container, and save it.
+5. Exit out of the container, and save it.  
 `sudo docker commit [container_ID] yfujimoto/motioneye:v1`
-6. Stop the original container:
+6. Stop the original container:  
 `sudo docker stop [container_ID]`  
-7, Run the new container:
+7, Run the new container:  
 `sudo docker run --device=/dev --privileged -p 8081:8081 -p 8765:8765 -v /mnt/motioneye/config:/etc/motioneye --restart=always yfujimoto/motioneye:v1`
  
 **Configure Apache Kafka on a Server**
 
-1. Pull Kafka Docker image:
+1. Pull Kafka Docker image:  
 `sudo docker pull spotify/kafka`
-2. Run the container:
-`sudo docker run -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=192.168.2.9 --env ADVERTISED_PORT=9092 spotify/kafka`
-3. Get into the container:
+2. Run the container:  
+`sudo docker run -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=x.x.x.x--env ADVERTISED_PORT=9092 spotify/kafka`
+3. Get into the container:  
 `sudo docker exec -it [container_id] bash`
-4. Create Kafka topics:
+4. Create Kafka topics:  
 `cd /opt/kafka_2.11-0.10.1.0/bin`  
 `./kafka-console-producer.sh --broker-list localhost:9092 --topic cat_water`  
 `./kafka-console-producer.sh --broker-list localhost:9092 --topic cat_motion`  
 `./kafka-console-producer.sh --broker-list localhost:9092 --topic cat_temp_humidity`
-5. Check if the topics were successfully created:
+5. Check if the topics were successfully created:  
 `./kafka-topics.sh --list --zookeeper localhost:2181`
-6. Exit out of the container, and save it.
+6. Exit out of the container, and save it.  
 `sudo docker commit [container_ID] yfujimoto/kafka:v1`
-7. Stop the original container:
+7. Stop the original container:  
 `sudo docker stop [container_ID]`  
-8. Run the new container:
-`sudo docker run -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=192.168.2.9 --env ADVERTISED_PORT=9092 --restart=always yfujimoto/kafka:v1`
+8. Run the new container:  
+`sudo docker run -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=x.x.x.x --env ADVERTISED_PORT=9092 --restart=always yfujimoto/kafka:v1`
 
 
 **Configure Apache Spark on a Server**
 
-1. Pull Spark Docker image:
+1. Pull Spark Docker image:  
 `sudo docker pull jupyter/pyspark-notebook`
-2. Create a directory to store files and notebooks:
+2. Create a directory to store files and notebooks:  
 `mkdir /home/yuibi/jupyter`  
 `chown 1000 /home/yuibi/jupyter`
-4. Run the container:
+4. Run the container:  
 `sudo docker run -d --user root -p 8888:8888 -e NB_UID=1000 -e NB_GID=100 -e GRANT_SUDO=yes -v /home/yuibi/jupyter:/home/jovyan/work jupyter/pyspark-notebook start-notebook.sh --NotebookApp.token=''`
-5. Get into the container:
+5. Get into the container:  
 `sudo docker exec -it [container_id] bash`
-6. (If you want to use spark deep learning. I ended up not using it since it was designed for batch process) set up conda (Python 2.7) environment and dependencies:
+6. (If you want to use spark deep learning. I ended up not using it since it was designed for batch process) set up conda (Python 2.7) environment and dependencies:  
 `apt-get update`  
 `cd /opt/conda`  
 `conda create -n yfujimoto python=2.7`  
 `source activate yfujimoto`  
 `conda install numpy scipy matplotlib pillow pandas h5py jupyter`  
 `pip install tensorflow keras opencv-python`
-7. Create a default config for Jupyter notebook:
+7. Create a default config for Jupyter notebook:  
 `jupyter notebook --generate-config`
-8. Modify the config:
+8. Modify the config:  
 `vi ~/.jupyter/jupyter_notebook_config.py`  
 (Change the following)  
 ```
 c.NotebookApp.port = 8989  
 c.NotebookApp.token = ''  
 ```
-9. Give jovyan user full access to .jupyter directory:
+9. Give jovyan user full access to .jupyter directory:  
 `chown -R jovyan.users ~/.jupyter`
-10. Run Jupyter notebook for test:
+10. Run Jupyter notebook for test:  
 `nohup su jovyan -c "env PATH=/opt/conda/envs/yfujimoto/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin /opt/conda/envs/yfujimoto/bin/python /opt/conda/bin/jupyter-notebook --NotebookApp.token= --NotebookApp.port=8989" &`
-11. Exit out of the container, and save it.
+11. Exit out of the container, and save it.  
 `sudo docker commit [container_ID] yfujimoto/pyspark:v1`
-12. Stop the original container:
+12. Stop the original container:  
 `sudo docker stop [container_ID]`  
-13. Run the new container:
+13. Run the new container:  
 `sudo docker run -d --user root -p 8888:8888 -p 8989:8989 -e NB_UID=1000 -e NB_GID=100 -e GRANT_SUDO=yes -v /home/yuibi/jupyter:/home/jovyan/work yfujimoto/pyspark:v1 start-notebook.sh --NotebookApp.token=''`
 
 

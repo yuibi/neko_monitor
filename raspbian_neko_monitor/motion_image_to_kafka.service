@@ -1,0 +1,11 @@
+Description=Send Motion Triggered Cat Water Image to Kafka
+
+[Service]
+ExecStart=/bin/bash -c '/usr/bin/python3 -u send_motion_image_to_kafka.py'
+WorkingDirectory=/root
+Restart=always
+User=root
+
+
+[Install]
+WantedBy=multi-user.target

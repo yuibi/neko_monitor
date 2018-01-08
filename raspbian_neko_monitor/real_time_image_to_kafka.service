@@ -1,0 +1,11 @@
+Description=Send Real-time Cat Water Image to Kafka
+
+[Service]
+ExecStart=/bin/bash -c '/usr/bin/python3 -u send_real_time_image_to_kafka.py'
+WorkingDirectory=/root
+Restart=always
+User=root
+
+
+[Install]
+WantedBy=multi-user.target

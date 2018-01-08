@@ -1,0 +1,38 @@
+<annotation>
+	<folder>resized</folder>
+	<filename>207.jpg</filename>
+	<path>C:\Users\yfujimoto\Documents\Python Scripts\ssd_keras-master\data\ssd_cat_water_train\jpg\resized\207.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>300</width>
+		<height>300</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>cat</name>
+		<pose>Unspecified</pose>
+		<truncated>1</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>206</xmin>
+			<ymin>125</ymin>
+			<xmax>300</xmax>
+			<ymax>300</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>fountain</name>
+		<pose>Unspecified</pose>
+		<truncated>1</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>35</xmin>
+			<ymin>1</ymin>
+			<xmax>139</xmax>
+			<ymax>81</ymax>
+		</bndbox>
+	</object>
+</annotation>

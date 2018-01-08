@@ -1,0 +1,11 @@
+Description=Send Temperature and Humidity to Kafka
+
+[Service]
+ExecStart=/bin/bash -c '/usr/bin/python3 -u send_temp_humidity_to_kafka.py'
+WorkingDirectory=/root
+Restart=always
+User=root
+
+
+[Install]
+WantedBy=multi-user.target

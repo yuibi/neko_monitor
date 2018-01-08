@@ -70,7 +70,7 @@ Instructions
 `cd Adafruit_Python_BME280`  
 `python3 setup.py install`  
 `cd ~`  
-8. Copy the content of this repo (send_real_time_image_to_kafka.py, send_motion_image_to_kafka.py, real_time_image_to_kafka.service, etc).
+8. Copy the content of this repo (raspbian_neko_monitor).
 9. Enable services:  
 `cp *.service /lib/systemd/system/`  
 `systemctl enable real_time_image_to_kafka.service`  
@@ -101,7 +101,7 @@ Instructions
 `sudo docker commit [container_ID] yfujimoto/motioneye:v1`
 6. Stop the original container:  
 `sudo docker stop [container_ID]`  
-7, Run the new container:  
+7. Run the new container:  
 `sudo docker run --device=/dev --privileged -p 8081:8081 -p 8765:8765 -v /mnt/motioneye/config:/etc/motioneye --restart=always yfujimoto/motioneye:v1`
  
 **Configure Apache Kafka on a Server**
